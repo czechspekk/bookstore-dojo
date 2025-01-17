@@ -14,9 +14,20 @@ export const BookSchema = z.object({
   // price is stored in cents
   price: z.number(),
   coverImage: z.string(),
+  published: z.boolean(),
+  publishedAt: z.optional(z.date()),
+  unpublishedAt: z.optional(z.date()),
   createdAt: z.date(),
-  updatedAt: z.date(),
+  updatedAt: z.optional(z.date()),
 });
+
+const CriteriaSchema = z.optional(
+  z.object({
+    published: z.optional(z.boolean()),
+  }),
+);
+
+export type Criteria = z.infer<typeof CriteriaSchema>;
 
 // Input Validation for 'GET users/:id' endpoint
 export const GetBookSchema = z.object({

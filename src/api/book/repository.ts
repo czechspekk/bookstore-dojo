@@ -1,4 +1,4 @@
-import type { Book } from "@/api/book/model";
+import type { Book, Criteria as BookCriteria } from "@/api/book/model";
 import { v4 } from "uuid";
 
 export const books: Book[] = [
@@ -8,6 +8,7 @@ export const books: Book[] = [
     description: "Book A description",
     authorId: "uuid-format-string",
     price: 1233,
+    published: false,
     coverImage: "https://some-image-url-1.png",
     createdAt: new Date(),
     updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
@@ -18,18 +19,24 @@ export const books: Book[] = [
     description: "Book B description",
     authorId: "uuid-format-string",
     price: 8533,
+    published: true,
     coverImage: "https://some-image-url-2.png",
     createdAt: new Date(),
     updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later  },
   },
 ];
 
-export class BookRepository {
-  async findAllAsync(): Promise<Book[]> {
+interface Getable {
+  getAll(Criteria: BookCriteria): Promise<Book[]>;
+  getById(id: string): Promise<Book | null>;
+}
+
+export class BookRepository implements Getable {
+  async getAll(criteriaProps: BookCriteria = {}): Promise<Book[]> {
     return books;
   }
 
-  async findByIdAsync(id: string): Promise<Book | null> {
+  async getById(id: string, criteriaProps: BookCriteria = {}): Promise<Book | null> {
     return books.find((book) => book.id === id) || null;
   }
 }

@@ -7,10 +7,10 @@ import type { ServiceResponse } from "@/common/models/serviceResponse";
 import { app } from "@/server";
 
 describe("Book API Endpoints", () => {
-  describe("GET /books", () => {
+  describe("GET /bookstore", () => {
     it("should return a list of books", async () => {
       // Act
-      const response = await request(app).get("/books");
+      const response = await request(app).get("/bookstore");
       const responseBody: ServiceResponse<Book[]> = response.body;
 
       // Assert
@@ -22,14 +22,14 @@ describe("Book API Endpoints", () => {
     });
   });
 
-  describe("GET /books/:id", () => {
+  describe("GET /bookstore/:id", () => {
     it("should return a book for a valid ID", async () => {
       // Arrange
       const testId = books[1].id;
       const expectedBook = books[1];
 
       // Act
-      const response = await request(app).get(`/books/${testId}`);
+      const response = await request(app).get(`/bookstore/${testId}`);
       const responseBody: ServiceResponse<Book> = response.body;
 
       // Assert
@@ -45,7 +45,7 @@ describe("Book API Endpoints", () => {
       const testId = "970472fb-adf1-4cf0-99d8-11cf9ceb70b5";
 
       // Act
-      const response = await request(app).get(`/books/${testId}`);
+      const response = await request(app).get(`/bookstore/${testId}`);
       const responseBody: ServiceResponse = response.body;
 
       // Assert
@@ -58,7 +58,7 @@ describe("Book API Endpoints", () => {
     it("should return a bad request for invalid ID format", async () => {
       // Act
       const invalidInput = "abc";
-      const response = await request(app).get(`/books/${invalidInput}`);
+      const response = await request(app).get(`/bookstore/${invalidInput}`);
       const responseBody: ServiceResponse = response.body;
 
       // Assert

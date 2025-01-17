@@ -14,6 +14,17 @@ class BookController {
     const serviceResponse = await bookService.findById(id);
     return handleServiceResponse(serviceResponse, res);
   };
+
+  public getPublishedBooks: RequestHandler = async (_req: Request, res: Response) => {
+    const serviceResponse = await bookService.findAll({ published: true });
+    return handleServiceResponse(serviceResponse, res);
+  };
+
+  public getPublishedBook: RequestHandler = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const serviceResponse = await bookService.findById(id, { published: true });
+    return handleServiceResponse(serviceResponse, res);
+  };
 }
 
 export const bookController = new BookController();

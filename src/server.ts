@@ -4,11 +4,14 @@ import helmet from "helmet";
 import { pino } from "pino";
 
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
+import { bookRouter, bookstoreRouter } from "@/api/book/router";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { userRouter } from "@/api/user/userRouter";
+import auth from "@/common/middleware/auth";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
+
 import { env } from "@/common/utils/envConfig";
 
 const logger = pino({ name: "server start" });
@@ -30,6 +33,8 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
+app.use("/books", auth, bookRouter);
+app.use("/bookstore", bookstoreRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

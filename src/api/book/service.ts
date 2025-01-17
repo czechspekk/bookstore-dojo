@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { Book } from "@/api/book/model";
+import type { Book, Criteria as BookCriteria } from "@/api/book/model";
 import { BookRepository } from "@/api/book/repository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -13,9 +13,9 @@ export class BookService {
   }
 
   // Retrieves all books from the database
-  async findAll(): Promise<ServiceResponse<Book[] | null>> {
+  async findAll(criteriaProps: BookCriteria): Promise<ServiceResponse<Book[] | null>> {
     try {
-      const books = await this.bookRepository.findAllAsync();
+      const books = await this.bookRepository.getAll();
       if (!books || books.length === 0) {
         return ServiceResponse.failure("No Books found", null, StatusCodes.NOT_FOUND);
       }
@@ -32,9 +32,9 @@ export class BookService {
   }
 
   // Retrieves a single book by their ID
-  async findById(id: string): Promise<ServiceResponse<Book | null>> {
+  async findById(id: string, criteriaProps: BookCriteria = {}): Promise<ServiceResponse<Book | null>> {
     try {
-      const book = await this.bookRepository.findByIdAsync(id);
+      const book = await this.bookRepository.getById(id);
       if (!book) {
         return ServiceResponse.failure("Book not found", null, StatusCodes.NOT_FOUND);
       }
