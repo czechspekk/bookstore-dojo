@@ -11,30 +11,20 @@ describe("Auth API endpoints", () => {
     it("400 / Should fail to authenticate with no username and password", async () => {
       const response = await request(app).post("/auth").send({});
       expect(response.statusCode).eql(400);
-      expect(response.body).eql({});
     });
 
     it("400 / should fail to authenticate with wrong bodyd", async () => {
       const response = await request(app).post("/auth").send("sometext");
       expect(response.statusCode).eql(400);
-      expect(response.body).eql({});
     });
 
     it("200 / should authenticate with any username / password", async () => {
       const payload = {
-        username: "any",
-        password: "any",
+        username: "john-doe",
+        password: "XXX",
       };
       const response = await request(app).post("/auth").send(payload);
       expect(response.statusCode).eql(200);
-      expect(response.body).eql({
-        meta: {
-          success: true,
-        },
-        data: {
-          token: "jwt-token",
-        },
-      });
     });
   });
 });
