@@ -6,7 +6,7 @@ export const auths: AuthEntity[] = [
     id: v4(),
     username: "john-doe",
     password: "XXX",
-    authorId: "uuid-format-string",
+    userId: "john-doe-uuid-string",
     isAdmin: true,
     createdAt: new Date(),
     updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
@@ -15,7 +15,7 @@ export const auths: AuthEntity[] = [
     id: v4(),
     username: "darth-vader",
     password: "XXX",
-    authorId: "darth-vader-uuid-string",
+    userId: "darth-vader-uuid-string",
     isAdmin: false,
     createdAt: new Date(),
     updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
