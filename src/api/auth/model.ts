@@ -10,8 +10,8 @@ export const AuthEntitySchema = z.object({
   password: z.string(),
   userId: z.string().uuid(),
   isAdmin: z.boolean(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const AuthTokenPayloadSchema = z.object({

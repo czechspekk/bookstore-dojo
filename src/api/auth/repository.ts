@@ -6,7 +6,7 @@ export const auths: AuthEntity[] = [
     id: v4(),
     username: "john-doe",
     password: "XXX",
-    userId: "john-doe-uuid-string",
+    userId: "fecd282a-d6be-11ef-8974-fbc2cb00b09b",
     isAdmin: true,
     createdAt: new Date(),
     updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later

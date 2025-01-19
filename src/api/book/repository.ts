@@ -1,7 +1,8 @@
-import type { Book, Criteria as BookCriteria } from "@/api/book/model";
+import type { AuthoredBook, Book, Criteria as BookCriteria, StoredBook } from "@/api/book/model";
+import { filter, isUndefined, matches, omitBy } from "lodash";
 import { v4 } from "uuid";
 
-export const books: Book[] = [
+export const books: StoredBook[] = [
   {
     id: v4(),
     title: "Book A",
@@ -32,11 +33,36 @@ interface Getable {
 }
 
 export class BookRepository implements Getable {
-  async getAll(criteriaProps: BookCriteria = {}): Promise<Book[]> {
+  private applyCriteria(books: StoredBook[], criteriaProps: BookCriteria): StoredBook[] {
+    return filter(books, matches(criteriaProps));
+  }
+  async addBook(newBookPayload: AuthoredBook): Promise<StoredBook> {
+    const now = new Date();
+    const newBook = omitBy(
+      {
+        id: v4(),
+        createdAt: now,
+        updatedAt: now,
+        published: false,
+        publishedAt: newBookPayload.published ? now : undefined,
+        ...newBookPayload,
+      },
+      isUndefined,
+    );
+
+    books.push(newBook);
+
+    return newBook;
+  }
+  async getByCriteria(criteriaProps: BookCriteria = {}): Promise<StoredBook[]> {
+    return this.applyCriteria(books, criteriaProps);
+  }
+
+  async getAll(): Promise<Book[]> {
     return books;
   }
 
   async getById(id: string, criteriaProps: BookCriteria = {}): Promise<Book | null> {
-    return books.find((book) => book.id === id) || null;
+    return this.applyCriteria(books, criteriaProps).find((book) => book.id === id) || null;
   }
 }

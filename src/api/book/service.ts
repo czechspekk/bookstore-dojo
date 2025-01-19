@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-import type { Book, Criteria as BookCriteria } from "@/api/book/model";
+import type { Book, Criteria as BookCriteria, StoredBook } from "@/api/book/model";
 import { BookRepository } from "@/api/book/repository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -12,14 +12,28 @@ export class BookService {
     this.bookRepository = repository;
   }
 
-  // Retrieves all books from the database
+  async createBook(newBookPayload: Book, authorId: string): Promise<StoredBook> {
+    const existingBooks: StoredBook[] = await this.bookRepository.getByCriteria({
+      title: newBookPayload.title,
+      authorId,
+    });
+
+    if (existingBooks.length) {
+      return ServiceResponse.failure(`You already own book with provided title: ${newBookPayload.title}`, {}, 409);
+    }
+
+    const newBook = await this.bookRepository.addBook({ authorId, ...newBookPayload });
+    return ServiceResponse.success<StoredBook>("Book created", newBook);
+  }
+
   async findAll(criteriaProps: BookCriteria): Promise<ServiceResponse<Book[] | null>> {
     try {
-      const books = await this.bookRepository.getAll();
+      const books = await this.bookRepository.getByCriteria(criteriaProps);
+
       if (!books || books.length === 0) {
         return ServiceResponse.failure("No Books found", null, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success<Book[]>("Books found", books);
+      return ServiceResponse.success<StoredBook[]>("Books found", books);
     } catch (ex) {
       const errorMessage = `Error finding all books: $${(ex as Error).message}`;
       logger.error(errorMessage);
@@ -32,13 +46,13 @@ export class BookService {
   }
 
   // Retrieves a single book by their ID
-  async findById(id: string, criteriaProps: BookCriteria = {}): Promise<ServiceResponse<Book | null>> {
+  async findById(id: string, criteriaProps: BookCriteria = {}): Promise<ServiceResponse<StoredBook | null>> {
     try {
       const book = await this.bookRepository.getById(id);
       if (!book) {
         return ServiceResponse.failure("Book not found", null, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success<Book>("Book found", book);
+      return ServiceResponse.success<StoredBook>("Book found", book);
     } catch (ex) {
       const errorMessage = `Error finding book with id ${id}:, ${(ex as Error).message}`;
       logger.error(errorMessage);

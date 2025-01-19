@@ -25,6 +25,13 @@ class BookController {
     const serviceResponse = await bookService.findById(id, { published: true });
     return handleServiceResponse(serviceResponse, res);
   };
+
+  public postBooks: RequestHandler = async (req: Request, res: Response) => {
+    const newBookPayload = req.body;
+    const { userId } = req.auth;
+    const serviceResponse = await bookService.createBook(newBookPayload, userId);
+    return handleServiceResponse(serviceResponse, res);
+  };
 }
 
 export const bookController = new BookController();

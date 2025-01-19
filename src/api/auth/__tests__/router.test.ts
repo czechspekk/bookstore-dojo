@@ -41,7 +41,7 @@ describe("Auth API endpoints", () => {
       } = response.body;
       const tokenPayload: AuthTokenPayload = jwt.verify(token, env.jwtSecret);
       const { userId, isAdmin } = tokenPayload;
-      expect(userId).eql("john-doe-uuid-string");
+      expect(userId).eql("fecd282a-d6be-11ef-8974-fbc2cb00b09b");
       expect(isAdmin).eql(true);
     });
   });
