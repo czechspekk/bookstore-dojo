@@ -18,6 +18,11 @@ Clone this repository and run the following commands
 ##  Discover API Endpoints
 
 Navigate to http://localhost:8080/docs to explore Swagger API documentation for all endpoints.
+There are 2 users available for Author
+`username` / `password`
+
+`john-doe` / `YAY`
+`darth-vader` / `darth-vader`
 
 # Decisions made on the way
 
@@ -85,3 +90,8 @@ I covered all Book endpoints with the Happy path tests, some of the unhappy path
 In general, these tests are full end to end integration tests and provide a great top level safety net.
 
 Further Unit tests would need to be added to cover: Model, Service, Controller & Repository
+
+## Disallowing certain books 
+
+Moderation can be done in many ways, I decided for generic property based match that would allow for any kind of moderation if required.
+Currently it is implentend with full match on given property, but this could be extended to support custom comparison operators etc.
