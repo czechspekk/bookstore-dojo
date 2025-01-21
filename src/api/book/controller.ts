@@ -5,8 +5,8 @@ import { bookService } from "@/api/book/service";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 
 class BookController {
-  public getBooks: RequestHandler = async (_req: Request, res: Response) => {
-    const serviceResponse = await bookService.findAll({ authorId: req.auth.usserId });
+  public getBooks: RequestHandler = async (req: Request, res: Response) => {
+    const serviceResponse = await bookService.findAll({ authorId: req.auth.userId });
     return handleServiceResponse(serviceResponse, res);
   };
 
@@ -39,6 +39,13 @@ class BookController {
     const { id } = req.params;
     const bookUpdatePayload: PatchBookPayload = req.body;
     const serviceResponse = await bookService.updateBook(id, bookUpdatePayload, userId);
+    return handleServiceResponse(serviceResponse, res);
+  };
+
+  public deleteBook: RequestHandler = async (req: Request, res: Response) => {
+    const { userId } = req.auth;
+    const { id } = req.params;
+    const serviceResponse = await bookService.deleteBook(id, userId);
     return handleServiceResponse(serviceResponse, res);
   };
 }

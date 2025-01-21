@@ -1,6 +1,4 @@
-import { commonValidations } from "@/common/utils/commonValidation";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import { get, set } from "lodash";
 import { z } from "zod";
 
 extendZodWithOpenApi(z);
@@ -44,8 +42,7 @@ const CriteriaSchema = z.optional(
 
 export type Criteria = z.infer<typeof CriteriaSchema>;
 
-// Input Validation for 'GET books/:id'
-export const GetBookSchema = z.object({
+const uuidResourceSchema = z.object({
   params: z.object({ id: z.string().uuid() }),
 });
 
@@ -54,13 +51,24 @@ export const PostBookSchema = z.object({
   body: BookSchema,
 });
 
-export type PatchBookPayload = z.infer<typeof PatchBookSchema>;
+export type PatchBookPayload = z.infer<typeof PatchBookPayloadSchema>;
+
+export const PatchBookPayloadSchema = z.object({
+  title: z.optional(z.string()),
+  description: z.optional(z.string()),
+  // price is stored in cents
+  price: z.optional(z.number()),
+  coverImage: z.optional(z.string()),
+  published: z.optional(z.boolean()),
+});
+
+// Input Validation for 'GET books/:id'
+export const GetBookSchema = uuidResourceSchema;
 
 // Input Validation for 'PATCH books/:id'
-export const PatchBookSchema = z.object({
-  ...Object.keys(BookSchema).reduce((acc, key: string) => {
-    set(acc, key, z.optional(get(BookSchema, key)));
-
-    return acc;
-  }, {}),
+export const PatchBookSchema = uuidResourceSchema.extend({
+  body: PatchBookPayloadSchema,
 });
+
+// Input Validation for 'DELETE books/:id'
+export const DeleteBookSchema = uuidResourceSchema;

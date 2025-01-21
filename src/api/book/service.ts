@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { utc } from "moment";
 
 import type { Book, Criteria as BookCriteria, PatchBookPayload, StoredBook } from "@/api/book/model";
 import { BookRepository } from "@/api/book/repository";
@@ -36,22 +37,35 @@ export class BookService {
       return ServiceResponse.failure("An error occurred while creating book.", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+  private buildPublishedTimestamps(existingRecord: StoredBook, updatePayload: PatchBookPayload) {
+    const now = utc().valueOf();
+    if (Object.keys(updatePayload).includes("published")) {
+      if (updatePayload.published && !existingRecord.published) {
+        return { publishedAt: now };
+      }
+      if (!updatePayload.published && existingRecord.published) {
+        return { unpublishedAt: now };
+      }
+    }
 
+    return {};
+  }
   async updateBook(
     id: string,
     bookUpdatePayload: PatchBookPayload,
     userId: string,
   ): Promise<ServiceResponse<StoredBook | null>> {
     try {
-      const existingRecord: StoredBook | undefined = await this.bookRepository.getById(id);
-
-      if (existingRecord?.authorId !== userId) {
+      const existingRecord: StoredBook | undefined = await this.bookRepository.getById(id, { authorId: userId });
+      if (!existingRecord) {
         return ServiceResponse.failure("No book found", null, StatusCodes.NOT_FOUND);
       }
 
+      const publishedTimestamps = this.buildPublishedTimestamps(existingRecord, bookUpdatePayload);
       const updatedFullPayload: StoredBook = {
         ...existingRecord,
         ...bookUpdatePayload,
+        ...publishedTimestamps,
       };
 
       const savedBook = await this.bookRepository.save(id, updatedFullPayload);
@@ -69,13 +83,30 @@ export class BookService {
     }
   }
 
+  async deleteBook(id: string, userId: string): Promise<ServiceResponse<null>> {
+    try {
+      const existingRecord: StoredBook | undefined = await this.bookRepository.getById(id, { authorId: userId });
+      if (!existingRecord) {
+        return ServiceResponse.failure("No book found", null, StatusCodes.NOT_FOUND);
+      }
+
+      await this.bookRepository.deleteBook(id);
+      return ServiceResponse.success("Book deleted", null, StatusCodes.NO_CONTENT);
+    } catch (ex) {
+      const errorMessage = `Error deleting book: $${(ex as Error).message}`;
+      logger.error(errorMessage);
+
+      return ServiceResponse.failure(
+        "An error occurred while retrieving books.",
+        null,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async findAll(criteriaProps: BookCriteria = {}): Promise<ServiceResponse<StoredBook[] | null>> {
     try {
       const books = await this.bookRepository.getByCriteria(criteriaProps);
-
-      if (!books || books.length === 0) {
-        return ServiceResponse.failure("No Books found", null, StatusCodes.NOT_FOUND);
-      }
       return ServiceResponse.success<StoredBook[]>("Books found", books);
     } catch (ex) {
       const errorMessage = `Error finding all books: $${(ex as Error).message}`;

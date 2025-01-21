@@ -75,6 +75,11 @@ export class BookRepository {
     return payload;
   }
 
+  async deleteBook(id: string): Promise<null> {
+    this.booksMap.delete(id);
+    return null;
+  }
+
   async getByCriteria(criteriaProps: BookCriteria = {}): Promise<StoredBook[]> {
     return this.applyCriteriaOnBooksMapValues(criteriaProps);
   }

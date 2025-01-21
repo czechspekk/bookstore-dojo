@@ -189,5 +189,33 @@ describe("Book API Endpoints", () => {
         expect(patchedBookResponse.statusCode).eql(StatusCodes.NOT_FOUND);
       });
     });
+
+    describe("DELETE /books/:id", () => {
+      it("204 / should delete existing book and return no content", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "john-doe",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const deletedBookResponse = await request(app)
+          .delete(`/books/${books[0].id}`)
+          .set("Authorization", `Bearer ${userToken}`);
+        expect(deletedBookResponse.statusCode).eql(StatusCodes.NO_CONTENT);
+      });
+
+      it("404 / should not allow update on not owned resource", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "john-doe",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const patchedBookResponse = await request(app)
+          .patch(`/books/${books[1].id}`)
+          .set("Authorization", `Bearer ${userToken}`)
+          .send({ title: "Updated title" });
+
+        expect(patchedBookResponse.statusCode).eql(StatusCodes.NOT_FOUND);
+      });
+    });
   });
 });
