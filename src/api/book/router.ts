@@ -7,10 +7,12 @@ import {
   BookSchema,
   DeleteBookSchema,
   GetBookSchema,
+  GetBooksSchema,
   PatchBookPayloadSchema,
   PatchBookSchema,
   PostBooksSchema,
   PutBookSchema,
+  SearchParamsSchema,
   StoredBookSchema,
 } from "@/api/book/model";
 import { validateRequest } from "@/common/utils/httpHandlers";
@@ -22,10 +24,10 @@ export const bookRouter: Router = express.Router();
 
 bookRegistry.register("Book", StoredBookSchema);
 
-bookstoreRouter.get("/", bookController.getPublishedBooks);
+bookstoreRouter.get("/", validateRequest(GetBooksSchema), bookController.getPublishedBooks);
 bookstoreRouter.get("/:id", validateRequest(GetBookSchema), bookController.getPublishedBook);
 
-bookRouter.get("/", bookController.getBooks);
+bookRouter.get("/", validateRequest(GetBooksSchema), bookController.getBooks);
 bookRouter.post("/", validateRequest(PostBooksSchema), bookController.postBooks);
 
 bookRouter.get("/:id", validateRequest(GetBookSchema), bookController.getBook);
@@ -33,14 +35,19 @@ bookRouter.patch("/:id", validateRequest(PatchBookSchema), bookController.patchB
 bookRouter.put("/:id", validateRequest(PutBookSchema), bookController.putBook);
 bookRouter.delete("/:id", validateRequest(DeleteBookSchema), bookController.deleteBook);
 
+const bearerAuth = bookRegistry.registerComponent("securitySchemes", "bearerAuth", {
+  type: "http",
+  scheme: "bearer",
+  bearerFormat: "JWT",
+});
+
 bookRegistry.registerPath({
   method: "get",
   path: "/books/",
   tags: ["Book"],
+  security: [{ [bearerAuth.name]: [] }],
   request: {
-    headers: z.object({
-      Authorization: z.string(),
-    }),
+    query: SearchParamsSchema,
   },
   responses: createApiResponse(z.array(StoredBookSchema), "Success"),
 });
@@ -49,10 +56,8 @@ bookRegistry.registerPath({
   method: "post",
   path: "/books/",
   tags: ["Book"],
+  security: [{ [bearerAuth.name]: [] }],
   request: {
-    headers: z.object({
-      Authorization: z.string(),
-    }),
     body: {
       content: {
         "application/json": {
@@ -68,11 +73,9 @@ bookRegistry.registerPath({
   method: "get",
   path: "/books/{id}",
   tags: ["Book"],
+  security: [{ [bearerAuth.name]: [] }],
   request: {
     params: GetBookSchema.shape.params,
-    headers: z.object({
-      Authorization: z.string(),
-    }),
   },
   responses: createApiResponse(StoredBookSchema, "Success"),
 });
@@ -81,11 +84,9 @@ bookRegistry.registerPath({
   method: "patch",
   path: "/books/{id}",
   tags: ["Book"],
+  security: [{ [bearerAuth.name]: [] }],
   request: {
     params: GetBookSchema.shape.params,
-    headers: z.object({
-      Authorization: z.string(),
-    }),
     body: {
       content: {
         "application/json": {
@@ -101,11 +102,9 @@ bookRegistry.registerPath({
   method: "put",
   path: "/books/{id}",
   tags: ["Book"],
+  security: [{ [bearerAuth.name]: [] }],
   request: {
     params: GetBookSchema.shape.params,
-    headers: z.object({
-      Authorization: z.string(),
-    }),
     body: {
       content: {
         "application/json": {
@@ -121,11 +120,9 @@ bookRegistry.registerPath({
   method: "delete",
   path: "/books/{id}",
   tags: ["Book"],
+  security: [{ [bearerAuth.name]: [] }],
   request: {
     params: GetBookSchema.shape.params,
-    headers: z.object({
-      Authorization: z.string(),
-    }),
   },
   responses: createApiResponse(z.null(), "Success", 204),
 });
@@ -134,7 +131,9 @@ bookRegistry.registerPath({
   method: "get",
   path: "/bookstore",
   tags: ["Bookstore"],
-  request: { params: GetBookSchema.shape.params },
+  request: {
+    query: SearchParamsSchema,
+  },
   responses: createApiResponse(z.array(StoredBookSchema), "Success"),
 });
 

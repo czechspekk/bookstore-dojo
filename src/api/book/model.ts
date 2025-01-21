@@ -40,6 +40,13 @@ const CriteriaSchema = z.optional(
   }),
 );
 
+export type SearchParams = z.infer<typeof SearchParamsSchema>;
+
+export const SearchParamsSchema = z.object({
+  authorId: z.optional(z.string()),
+  title: z.optional(z.string()),
+});
+
 export type Criteria = z.infer<typeof CriteriaSchema>;
 
 const uuidResourceSchema = z.object({
@@ -64,6 +71,10 @@ export const PatchBookPayloadSchema = z.object({
   price: z.optional(z.number()),
   coverImage: z.optional(z.string()),
   published: z.optional(z.boolean()),
+});
+// Input Validation for 'GET books/:id'
+export const GetBooksSchema = z.object({
+  query: z.optional(SearchParamsSchema),
 });
 
 // Input Validation for 'GET books/:id'

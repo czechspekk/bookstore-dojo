@@ -1,12 +1,13 @@
 import type { Request, RequestHandler, Response } from "express";
 
-import type { Book, PatchBookPayload } from "@/api/book/model";
+import type { Book, PatchBookPayload, SearchParams } from "@/api/book/model";
 import { bookService } from "@/api/book/service";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 
 class BookController {
   public getBooks: RequestHandler = async (req: Request, res: Response) => {
-    const serviceResponse = await bookService.findAll({ authorId: req.auth.userId });
+    const searchParams: SearchParams = req.query;
+    const serviceResponse = await bookService.findAll({ ...searchParams, authorId: req.auth.userId });
     return handleServiceResponse(serviceResponse, res);
   };
 
@@ -16,8 +17,9 @@ class BookController {
     return handleServiceResponse(serviceResponse, res);
   };
 
-  public getPublishedBooks: RequestHandler = async (_req: Request, res: Response) => {
-    const serviceResponse = await bookService.findAll({ published: true });
+  public getPublishedBooks: RequestHandler = async (req: Request, res: Response) => {
+    const searchParams: SearchParams = req.query;
+    const serviceResponse = await bookService.findAll({ ...searchParams, published: true });
     return handleServiceResponse(serviceResponse, res);
   };
 
