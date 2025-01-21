@@ -1,5 +1,5 @@
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { AuthTokenResponseSchema } from "@/api/auth/model";
+import { AuthPayloadSchema, AuthTokenResponseSchema } from "@/api/auth/model";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
@@ -15,5 +15,14 @@ authRegistry.registerPath({
   method: "post",
   path: "/auth",
   tags: ["Auth"],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: AuthPayloadSchema,
+        },
+      },
+    },
+  },
   responses: createApiResponse(z.array(AuthTokenResponseSchema), "success"),
 });

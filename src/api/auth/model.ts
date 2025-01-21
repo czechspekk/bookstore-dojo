@@ -20,11 +20,13 @@ export const AuthTokenPayloadSchema = z.object({
 });
 export type AuthTokenPayload = z.infer<typeof AuthTokenPayloadSchema>;
 
+export const AuthPayloadSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+});
+
 export const PostAuthSchema = z.object({
-  body: z.object({
-    username: z.string(),
-    password: z.string(),
-  }),
+  body: AuthPayloadSchema,
 });
 
 export type PostAuth = z.infer<typeof PostAuthSchema>;
