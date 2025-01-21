@@ -35,8 +35,8 @@ describe("Book API Endpoints", () => {
     describe("GET /bookstore/:id", () => {
       it("should return a book for a valid ID", async () => {
         // Arrange
-        const testId = books[1].id;
-        const expectedBook = books[1];
+        const testId = books[0].id;
+        const expectedBook = books[0];
 
         // Act
         const response = await request(app).get(`/bookstore/${testId}`);
@@ -130,7 +130,43 @@ describe("Book API Endpoints", () => {
         const existingBook = StoredBookSchema.parse(existingBookResponse.body.responseObject);
         compareBooks(storedBook, existingBook);
       });
+      it("400 / should not allow wrong payloads", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "john-doe",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const postBooksResponse = await request(app)
+          .post("/books/")
+          .set("Authorization", `Bearer ${userToken}`)
+          .send({});
+
+        expect(postBooksResponse.statusCode).eql(StatusCodes.BAD_REQUEST);
+      });
+
+      it("403 / forbidden books", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "darth-vader",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+
+        const newBookPayload: Book = {
+          title: "Perdido train station",
+          description: "Beneath the towering bleached ribs ...",
+          price: 3900,
+          coverImage: "https://m.media-amazon.com/images/I/81BMaOWWTVL._SY466_.jpg",
+          published: true,
+        };
+        const storedBookResponse = await request(app)
+          .post("/books/")
+          .set("Authorization", `Bearer ${userToken}`)
+          .send(newBookPayload);
+
+        expect(storedBookResponse.statusCode).eql(StatusCodes.FORBIDDEN);
+      });
     });
+
     describe("GET /books/:id", () => {
       it("200 / should return owned resource", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
@@ -188,8 +224,21 @@ describe("Book API Endpoints", () => {
 
         expect(patchedBookResponse.statusCode).eql(StatusCodes.NOT_FOUND);
       });
-    });
+      it("403 / forbidden books", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "darth-vader",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
 
+        const storedBookResponse = await request(app)
+          .patch(`/books/${books[1].id}`)
+          .set("Authorization", `Bearer ${userToken}`)
+          .send({ published: true });
+
+        expect(storedBookResponse.statusCode).eql(StatusCodes.FORBIDDEN);
+      });
+    });
     describe("PUT /books/:id", () => {
       it("200 / should replace existing book and return StoredBookSchema", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
@@ -210,7 +259,26 @@ describe("Book API Endpoints", () => {
         const putBook = StoredBookSchema.parse(putBookResponse.body.responseObject);
         compareBooks(newContent, putBook);
       });
+      it("403 / should not allow forbidden book", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "darth-vader",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const newContent: Book = {
+          title: "Updated title",
+          description: "Updated description",
+          price: 9999,
+          coverImage: "https://new-url",
+          published: true,
+        };
+        const putBookResponse = await request(app)
+          .put(`/books/${books[1].id}`)
+          .set("Authorization", `Bearer ${userToken}`)
+          .send(newContent);
 
+        expect(putBookResponse.statusCode).eql(StatusCodes.FORBIDDEN);
+      });
       it("400 / should not allow wrong payloads", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",

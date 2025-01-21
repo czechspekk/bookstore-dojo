@@ -15,7 +15,7 @@ export const auths: AuthEntity[] = [
     id: v4(),
     username: "darth-vader",
     password: "XXX",
-    userId: "fecd282a-d6be-11ef-8975-fax4cb00b09b",
+    userId: "b00c67e3-e4fc-4973-bc99-f4a6d6b80743",
     isAdmin: false,
     createdAt: new Date(),
     updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later

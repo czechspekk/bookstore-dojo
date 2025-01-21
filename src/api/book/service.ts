@@ -1,16 +1,35 @@
 import { StatusCodes } from "http-status-codes";
+import { filter, matches } from "lodash";
 import { utc } from "moment";
 
-import type { Book, Criteria as BookCriteria, PatchBookPayload, StoredBook } from "@/api/book/model";
+import type { AuthoredBook, Book, Criteria as BookCriteria, PatchBookPayload, StoredBook } from "@/api/book/model";
 import { BookRepository } from "@/api/book/repository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 
+const forbiddenBooks: BookCriteria[] = [
+  {
+    authorId: "b00c67e3-e4fc-4973-bc99-f4a6d6b80743",
+    published: true,
+  },
+];
+
 export class BookService {
   private bookRepository: BookRepository;
+  private disallowedBookPropertyCombinations: BookCriteria[];
 
-  constructor(repository: BookRepository = new BookRepository()) {
+  constructor(
+    repository: BookRepository = new BookRepository(),
+    disallowedBookPropertyCombinations: BookCriteria[] = forbiddenBooks,
+  ) {
     this.bookRepository = repository;
+    this.disallowedBookPropertyCombinations = disallowedBookPropertyCombinations;
+  }
+
+  private isBookAllowed(book: AuthoredBook): boolean {
+    return !this.disallowedBookPropertyCombinations.some(
+      (criteria: BookCriteria) => filter([book], matches(criteria)).length,
+    );
   }
 
   async createBook(newBookPayload: Book, authorId: string): Promise<ServiceResponse<StoredBook | null>> {
@@ -27,8 +46,11 @@ export class BookService {
           StatusCodes.CONFLICT,
         );
       }
-
-      const newBook = await this.bookRepository.addBook({ authorId, ...newBookPayload });
+      const authoredBook: AuthoredBook = { authorId, ...newBookPayload };
+      if (!this.isBookAllowed(authoredBook)) {
+        return ServiceResponse.failure("This book is not allowed", null, StatusCodes.FORBIDDEN);
+      }
+      const newBook = await this.bookRepository.addBook(authoredBook);
 
       return ServiceResponse.success<StoredBook>("Book created", newBook);
     } catch (ex) {
@@ -68,6 +90,10 @@ export class BookService {
         ...publishedTimestamps,
       };
 
+      if (!this.isBookAllowed(updatedFullPayload)) {
+        return ServiceResponse.failure("This book is not allowed", null, StatusCodes.FORBIDDEN);
+      }
+
       const savedBook = await this.bookRepository.save(id, updatedFullPayload);
 
       return ServiceResponse.success("Book updated", savedBook);
@@ -96,6 +122,10 @@ export class BookService {
         ...bookPayload,
         ...publishedTimestamps,
       };
+
+      if (!this.isBookAllowed(updatedFullPayload)) {
+        return ServiceResponse.failure("This book is not allowed", null, StatusCodes.FORBIDDEN);
+      }
 
       const savedBook = await this.bookRepository.save(id, updatedFullPayload);
       return ServiceResponse.success("Book replaced", savedBook);
