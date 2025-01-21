@@ -10,9 +10,9 @@ Prerequisities:
     Node(22) ideally via nvm
 
 Clone this repository and run the following commands
-
-    npm install
+    
     cp .env.template .env
+    npm install && npm run build
     npm start
 
 ##  Discover API Endpoints
