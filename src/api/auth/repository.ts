@@ -5,7 +5,7 @@ export const auths: AuthEntity[] = [
   {
     id: v4(),
     username: "john-doe",
-    password: "XXX",
+    password: "YAY",
     userId: "fecd282a-d6be-11ef-8974-fbc2cb00b09b",
     isAdmin: true,
     createdAt: new Date(),
@@ -14,7 +14,7 @@ export const auths: AuthEntity[] = [
   {
     id: v4(),
     username: "darth-vader",
-    password: "XXX",
+    password: "YAY",
     userId: "b00c67e3-e4fc-4973-bc99-f4a6d6b80743",
     isAdmin: false,
     createdAt: new Date(),

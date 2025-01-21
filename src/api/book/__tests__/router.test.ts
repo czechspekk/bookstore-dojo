@@ -103,7 +103,7 @@ describe("Book API Endpoints", () => {
       it("200 / should create new book and return StoredBookSchema", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
 
@@ -133,7 +133,7 @@ describe("Book API Endpoints", () => {
       it("400 / should not allow wrong payloads", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const postBooksResponse = await request(app)
@@ -147,7 +147,7 @@ describe("Book API Endpoints", () => {
       it("403 / forbidden books", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "darth-vader",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
 
@@ -171,7 +171,7 @@ describe("Book API Endpoints", () => {
       it("200 / should return owned resource", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const getBookResponse = await request(app)
@@ -185,7 +185,7 @@ describe("Book API Endpoints", () => {
       it("404 / should not allow get on not owned resource", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const getBookResponse = await request(app)
@@ -200,7 +200,7 @@ describe("Book API Endpoints", () => {
       it("200 / should update existing book and return StoredBookSchema", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const patchedBookResponse = await request(app)
@@ -214,7 +214,7 @@ describe("Book API Endpoints", () => {
       it("404 / should not allow update on not owned resource", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const patchedBookResponse = await request(app)
@@ -227,7 +227,7 @@ describe("Book API Endpoints", () => {
       it("403 / forbidden books", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "darth-vader",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
 
@@ -243,7 +243,7 @@ describe("Book API Endpoints", () => {
       it("200 / should replace existing book and return StoredBookSchema", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const newContent: Book = {
@@ -262,7 +262,7 @@ describe("Book API Endpoints", () => {
       it("403 / should not allow forbidden book", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "darth-vader",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const newContent: Book = {
@@ -282,7 +282,7 @@ describe("Book API Endpoints", () => {
       it("400 / should not allow wrong payloads", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const putBookResponse = await request(app)
@@ -296,7 +296,7 @@ describe("Book API Endpoints", () => {
       it("404 / should not allow update on not owned resource", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const newContent: Book = {
@@ -318,7 +318,7 @@ describe("Book API Endpoints", () => {
       it("204 / should delete existing book and return no content", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const deletedBookResponse = await request(app)
@@ -330,7 +330,7 @@ describe("Book API Endpoints", () => {
       it("404 / should not allow update on not owned resource", async () => {
         const tokenResponse = await request(app).post("/auth/").send({
           username: "john-doe",
-          password: "XXX",
+          password: "YAY",
         });
         const userToken = tokenResponse.body.responseObject.token;
         const patchedBookResponse = await request(app)

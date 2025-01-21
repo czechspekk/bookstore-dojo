@@ -32,7 +32,7 @@ describe("Auth API endpoints", () => {
     it("200 / should authenticate with correct username / password", async () => {
       const payload: PostAuth = {
         username: "john-doe",
-        password: "XXX",
+        password: "YAY",
       };
       const response = await request(app).post("/auth").send(payload);
       expect(response.statusCode).eql(200);
