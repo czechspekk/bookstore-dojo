@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 
-import type { User } from "@/api/user/userModel";
-import { users } from "@/api/user/userRepository";
+import type { User } from "@/api/user/model";
+import { users } from "@/api/user/repository";
 import type { ServiceResponse } from "@/common/models/serviceResponse";
 import { app } from "@/server";
 
@@ -25,8 +25,8 @@ describe("User API Endpoints", () => {
   describe("GET /users/:id", () => {
     it("should return a user for a valid ID", async () => {
       // Arrange
-      const testId = 1;
-      const expectedUser = users.find((user) => user.id === testId) as User;
+      const expectedUser = users[0];
+      const testId = expectedUser.id;
 
       // Act
       const response = await request(app).get(`/users/${testId}`);
@@ -42,7 +42,7 @@ describe("User API Endpoints", () => {
 
     it("should return a not found error for non-existent ID", async () => {
       // Arrange
-      const testId = Number.MAX_SAFE_INTEGER;
+      const testId = "c12367e3-e4fc-4973-bc99-f4a6d6b80743";
 
       // Act
       const response = await request(app).get(`/users/${testId}`);
@@ -57,7 +57,7 @@ describe("User API Endpoints", () => {
 
     it("should return a bad request for invalid ID format", async () => {
       // Act
-      const invalidInput = "abc";
+      const invalidInput = 1;
       const response = await request(app).get(`/users/${invalidInput}`);
       const responseBody: ServiceResponse = response.body;
 
@@ -76,9 +76,7 @@ function compareUsers(mockUser: User, responseUser: User) {
   }
 
   expect(responseUser.id).toEqual(mockUser.id);
-  expect(responseUser.name).toEqual(mockUser.name);
-  expect(responseUser.email).toEqual(mockUser.email);
-  expect(responseUser.age).toEqual(mockUser.age);
-  expect(new Date(responseUser.createdAt)).toEqual(mockUser.createdAt);
-  expect(new Date(responseUser.updatedAt)).toEqual(mockUser.updatedAt);
+  expect(responseUser.authorName).toEqual(mockUser.authorName);
+  expect(responseUser.createdAt).toEqual(mockUser.createdAt);
+  expect(responseUser.updatedAt).toEqual(mockUser.updatedAt);
 }

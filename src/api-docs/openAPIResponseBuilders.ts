@@ -18,15 +18,15 @@ export function createApiResponse(schema: z.ZodTypeAny, description: string, sta
 
 // Use if you want multiple responses for a single endpoint
 
-// import { ResponseConfig } from '@asteasolutions/zod-to-openapi';
-// import { ApiResponseConfig } from '@common/models/openAPIResponseConfig';
+// import { ResponseConfig } from '@asteasolutions/zod-to-openapi'
+// import { ApiResponseConfig } from '@common/models/openAPIResponseConfig'
 // export type ApiResponseConfig = {
-//   schema: z.ZodTypeAny;
-//   description: string;
-//   statusCode: StatusCodes;
-// };
+//   schema: z.ZodTypeAny
+//   description: string
+//   statusCode: StatusCodes
+// }
 // export function createApiResponses(configs: ApiResponseConfig[]) {
-//   const responses: { [key: string]: ResponseConfig } = {};
+//   const responses: { [key: string]: ResponseConfig } = {}
 //   configs.forEach(({ schema, description, statusCode }) => {
 //     responses[statusCode] = {
 //       description,
@@ -35,7 +35,7 @@ export function createApiResponse(schema: z.ZodTypeAny, description: string, sta
 //           schema: ServiceResponseSchema(schema),
 //         },
 //       },
-//     };
-//   });
-//   return responses;
+//     }
+//   })
+//   return responses
 // }

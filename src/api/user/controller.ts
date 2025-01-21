@@ -1,6 +1,6 @@
 import type { Request, RequestHandler, Response } from "express";
 
-import { userService } from "@/api/user/userService";
+import { userService } from "@/api/user/service";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 
 class UserController {
@@ -10,7 +10,7 @@ class UserController {
   };
 
   public getUser: RequestHandler = async (req: Request, res: Response) => {
-    const id = Number.parseInt(req.params.id as string, 10);
+    const { id } = req.params;
     const serviceResponse = await userService.findById(id);
     return handleServiceResponse(serviceResponse, res);
   };

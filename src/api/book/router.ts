@@ -25,15 +25,93 @@ bookRouter.delete("/:id", validateRequest(DeleteBookSchema), bookController.dele
 
 bookRegistry.registerPath({
   method: "get",
-  path: "/bookstore/",
+  path: "/books/",
   tags: ["Book"],
+  request: {
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+  },
+  responses: createApiResponse(z.array(StoredBookSchema), "Success"),
+});
+
+bookRegistry.registerPath({
+  method: "post",
+  path: "/books/",
+  tags: ["Book"],
+  request: {
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: PostBookSchema,
+        },
+      },
+    },
+  },
+  responses: createApiResponse(StoredBookSchema, "Success"),
+});
+
+bookRegistry.registerPath({
+  method: "get",
+  path: "/books/{id}",
+  tags: ["Book"],
+  request: {
+    params: GetBookSchema.shape.params,
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+  },
+  responses: createApiResponse(StoredBookSchema, "Success"),
+});
+
+bookRegistry.registerPath({
+  method: "patch",
+  path: "/books/{id}",
+  tags: ["Book"],
+  request: {
+    params: GetBookSchema.shape.params,
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: PatchBookSchema,
+        },
+      },
+    },
+  },
+  responses: createApiResponse(StoredBookSchema, "Success"),
+});
+
+bookRegistry.registerPath({
+  method: "delete",
+  path: "/books/{id}",
+  tags: ["Book"],
+  request: {
+    params: GetBookSchema.shape.params,
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+  },
+  responses: createApiResponse(z.null(), "Success", 204),
+});
+
+bookRegistry.registerPath({
+  method: "get",
+  path: "/bookstore",
+  tags: ["Bookstore"],
+  request: { params: GetBookSchema.shape.params },
   responses: createApiResponse(z.array(StoredBookSchema), "Success"),
 });
 
 bookRegistry.registerPath({
   method: "get",
   path: "/bookstore/{id}",
-  tags: ["Book"],
+  tags: ["Bookstore"],
   request: { params: GetBookSchema.shape.params },
   responses: createApiResponse(StoredBookSchema, "Success"),
 });

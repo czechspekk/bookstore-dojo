@@ -7,7 +7,7 @@ import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import { authRouter } from "@/api/auth/router";
 import { bookRouter, bookstoreRouter } from "@/api/book/router";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
-import { userRouter } from "@/api/user/userRouter";
+import { userRouter } from "@/api/user/router";
 
 import auth from "@/common/middleware/auth";
 import errorHandler from "@/common/middleware/errorHandler";
