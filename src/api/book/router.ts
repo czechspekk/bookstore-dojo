@@ -3,7 +3,7 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { BookSchema, GetBookSchema, PostBookSchema } from "@/api/book/model";
+import { BookSchema, GetBookSchema, PatchBookSchema, PostBookSchema } from "@/api/book/model";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { bookController } from "./controller";
 
@@ -20,6 +20,7 @@ bookRouter.get("/", bookController.getBooks);
 bookRouter.post("/", validateRequest(PostBookSchema), bookController.postBooks);
 
 bookRouter.get("/:id", validateRequest(GetBookSchema), bookController.getBook);
+bookRouter.patch("/:id", validateRequest(PatchBookSchema), bookController.patchBook);
 
 bookRegistry.registerPath({
   method: "get",

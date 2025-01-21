@@ -1,68 +1,89 @@
 import type { AuthoredBook, Book, Criteria as BookCriteria, StoredBook } from "@/api/book/model";
-import { filter, isUndefined, matches, omitBy } from "lodash";
+import { filter, matches } from "lodash";
+import { utc } from "moment";
 import { v4 } from "uuid";
 
-export const books: StoredBook[] = [
+export const localBooks = [
   {
-    id: v4(),
+    id: "9583a380-d76d-11ef-8581-b77e5beeab64",
     title: "Book A",
     description: "Book A description",
-    authorId: "uuid-format-string",
+    authorId: "fecd282a-d6be-11ef-8974-fbc2cb00b09b",
     price: 1233,
     published: false,
     coverImage: "https://some-image-url-1.png",
-    createdAt: new Date(),
-    updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
+    createdAt: utc().add(-4, "days").valueOf(),
+    updatedAt: utc().add("-1", "days").valueOf(),
+    publishedAt: utc().add(-2, "days").valueOf(),
+    unpublishedAt: utc().add(-1, "days").valueOf(),
   },
   {
-    id: v4(),
+    id: "9583a63c-d76d-11ef-8582-e3f2863584ec",
     title: "Book B",
     description: "Book B description",
-    authorId: "uuid-format-string",
+    authorId: "fecd282a-d6be-11ef-8975-fax4cb00b09b",
     price: 8533,
     published: true,
     coverImage: "https://some-image-url-2.png",
-    createdAt: new Date(),
-    updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later  },
+    createdAt: utc().add(-4, "days").valueOf(),
+    updatedAt: utc().add("-1", "days").valueOf(),
+    publishedAt: utc().add(-2, "days").valueOf(),
   },
 ];
 
-interface Getable {
-  getAll(Criteria: BookCriteria): Promise<Book[]>;
-  getById(id: string): Promise<Book | null>;
-}
+export class BookRepository {
+  private booksMap: Map<string, StoredBook> = new Map();
 
-export class BookRepository implements Getable {
-  private applyCriteria(books: StoredBook[], criteriaProps: BookCriteria): StoredBook[] {
-    return filter(books, matches(criteriaProps));
+  constructor(bookRecords: StoredBook[] = localBooks) {
+    this.populateBooksMap(bookRecords);
   }
-  async addBook(newBookPayload: AuthoredBook): Promise<StoredBook> {
-    const now = new Date();
-    const newBook = omitBy(
-      {
-        id: v4(),
-        createdAt: now,
-        updatedAt: now,
-        published: false,
-        publishedAt: newBookPayload.published ? now : undefined,
-        ...newBookPayload,
-      },
-      isUndefined,
-    );
 
-    books.push(newBook);
+  private populateBooksMap(bookRecords: StoredBook[]): void {
+    bookRecords.forEach((book) => this.booksMap.set(book.id, book));
+  }
+
+  private convertBooksMapToBooksArray(): StoredBook[] {
+    return Array.from(this.booksMap, ([, book]) => book);
+  }
+
+  private applyCriteriaOnBooksMapValues(criteriaProps: BookCriteria): StoredBook[] {
+    return filter(this.convertBooksMapToBooksArray(), matches(criteriaProps));
+  }
+
+  async addBook(newBookPayload: AuthoredBook): Promise<StoredBook> {
+    const now = utc().valueOf();
+    const newBook: StoredBook = {
+      id: v4(),
+      createdAt: now,
+      updatedAt: now,
+      published: false,
+      publishedAt: newBookPayload.published ? now : undefined,
+      ...newBookPayload,
+    };
+
+    this.booksMap.set(newBook.id, newBook);
 
     return newBook;
   }
+
+  async save(id: string, payload: StoredBook): Promise<StoredBook> {
+    this.booksMap.set(id, {
+      ...payload,
+      updatedAt: utc().valueOf(),
+    });
+
+    return payload;
+  }
+
   async getByCriteria(criteriaProps: BookCriteria = {}): Promise<StoredBook[]> {
-    return this.applyCriteria(books, criteriaProps);
+    return this.applyCriteriaOnBooksMapValues(criteriaProps);
   }
 
   async getAll(): Promise<Book[]> {
-    return books;
+    return this.getByCriteria();
   }
 
-  async getById(id: string, criteriaProps: BookCriteria = {}): Promise<Book | null> {
-    return this.applyCriteria(books, criteriaProps).find((book) => book.id === id) || null;
+  async getById(id: string, criteriaProps: BookCriteria = {}): Promise<StoredBook | undefined> {
+    return this.applyCriteriaOnBooksMapValues({ ...criteriaProps, id }).shift();
   }
 }
