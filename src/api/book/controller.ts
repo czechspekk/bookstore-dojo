@@ -42,6 +42,14 @@ class BookController {
     return handleServiceResponse(serviceResponse, res);
   };
 
+  public putBook: RequestHandler = async (req: Request, res: Response) => {
+    const { userId } = req.auth;
+    const { id } = req.params;
+    const bookPayload: Book = req.body;
+    const serviceResponse = await bookService.replaceBook(id, bookPayload, userId);
+    return handleServiceResponse(serviceResponse, res);
+  };
+
   public deleteBook: RequestHandler = async (req: Request, res: Response) => {
     const { userId } = req.auth;
     const { id } = req.params;

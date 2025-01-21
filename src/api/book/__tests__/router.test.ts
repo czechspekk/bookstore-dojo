@@ -190,6 +190,62 @@ describe("Book API Endpoints", () => {
       });
     });
 
+    describe("PUT /books/:id", () => {
+      it("200 / should replace existing book and return StoredBookSchema", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "john-doe",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const newContent: Book = {
+          title: "Updated title",
+          description: "Updated description",
+          price: 9999,
+          coverImage: "https://new-url",
+        };
+        const putBookResponse = await request(app)
+          .put(`/books/${books[0].id}`)
+          .set("Authorization", `Bearer ${userToken}`)
+          .send(newContent);
+        const putBook = StoredBookSchema.parse(putBookResponse.body.responseObject);
+        compareBooks(newContent, putBook);
+      });
+
+      it("400 / should not allow wrong payloads", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "john-doe",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const putBookResponse = await request(app)
+          .put(`/books/${books[1].id}`)
+          .set("Authorization", `Bearer ${userToken}`)
+          .send({});
+
+        expect(putBookResponse.statusCode).eql(StatusCodes.BAD_REQUEST);
+      });
+
+      it("404 / should not allow update on not owned resource", async () => {
+        const tokenResponse = await request(app).post("/auth/").send({
+          username: "john-doe",
+          password: "XXX",
+        });
+        const userToken = tokenResponse.body.responseObject.token;
+        const newContent: Book = {
+          title: "Updated title",
+          description: "Updated description",
+          price: 9999,
+          coverImage: "https://new-url",
+        };
+        const putBookResponse = await request(app)
+          .put(`/books/${books[1].id}`)
+          .set("Authorization", `Bearer ${userToken}`)
+          .send(newContent);
+
+        expect(putBookResponse.statusCode).eql(StatusCodes.NOT_FOUND);
+      });
+    });
+
     describe("DELETE /books/:id", () => {
       it("204 / should delete existing book and return no content", async () => {
         const tokenResponse = await request(app).post("/auth/").send({

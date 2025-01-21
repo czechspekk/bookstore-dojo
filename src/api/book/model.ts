@@ -47,7 +47,11 @@ const uuidResourceSchema = z.object({
 });
 
 // Input Validation for 'POST books/'
-export const PostBookSchema = z.object({
+export const PostBooksSchema = z.object({
+  body: BookSchema,
+});
+
+export const PutBookSchema = z.object({
   body: BookSchema,
 });
 

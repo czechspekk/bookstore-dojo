@@ -3,7 +3,16 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { DeleteBookSchema, GetBookSchema, PatchBookSchema, PostBookSchema, StoredBookSchema } from "@/api/book/model";
+import {
+  BookSchema,
+  DeleteBookSchema,
+  GetBookSchema,
+  PatchBookPayloadSchema,
+  PatchBookSchema,
+  PostBooksSchema,
+  PutBookSchema,
+  StoredBookSchema,
+} from "@/api/book/model";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { bookController } from "./controller";
 
@@ -17,10 +26,11 @@ bookstoreRouter.get("/", bookController.getPublishedBooks);
 bookstoreRouter.get("/:id", validateRequest(GetBookSchema), bookController.getPublishedBook);
 
 bookRouter.get("/", bookController.getBooks);
-bookRouter.post("/", validateRequest(PostBookSchema), bookController.postBooks);
+bookRouter.post("/", validateRequest(PostBooksSchema), bookController.postBooks);
 
 bookRouter.get("/:id", validateRequest(GetBookSchema), bookController.getBook);
 bookRouter.patch("/:id", validateRequest(PatchBookSchema), bookController.patchBook);
+bookRouter.put("/:id", validateRequest(PutBookSchema), bookController.putBook);
 bookRouter.delete("/:id", validateRequest(DeleteBookSchema), bookController.deleteBook);
 
 bookRegistry.registerPath({
@@ -46,7 +56,7 @@ bookRegistry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: PostBookSchema,
+          schema: BookSchema,
         },
       },
     },
@@ -79,7 +89,27 @@ bookRegistry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: PatchBookSchema,
+          schema: PatchBookPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: createApiResponse(StoredBookSchema, "Success"),
+});
+
+bookRegistry.registerPath({
+  method: "put",
+  path: "/books/{id}",
+  tags: ["Book"],
+  request: {
+    params: GetBookSchema.shape.params,
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: BookSchema,
         },
       },
     },

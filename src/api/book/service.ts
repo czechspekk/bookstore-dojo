@@ -83,6 +83,34 @@ export class BookService {
     }
   }
 
+  async replaceBook(id: string, bookPayload: Book, userId: string): Promise<ServiceResponse<StoredBook | null>> {
+    try {
+      const existingRecord: StoredBook | undefined = await this.bookRepository.getById(id, { authorId: userId });
+      if (!existingRecord) {
+        return ServiceResponse.failure("No book found", null, StatusCodes.NOT_FOUND);
+      }
+
+      const publishedTimestamps = this.buildPublishedTimestamps(existingRecord, bookPayload);
+      const updatedFullPayload: StoredBook = {
+        ...existingRecord,
+        ...bookPayload,
+        ...publishedTimestamps,
+      };
+
+      const savedBook = await this.bookRepository.save(id, updatedFullPayload);
+      return ServiceResponse.success("Book replaced", savedBook);
+    } catch (ex) {
+      const errorMessage = `Error replacing book: $${(ex as Error).message}`;
+      logger.error(errorMessage);
+
+      return ServiceResponse.failure(
+        "An error occurred while retrieving books.",
+        null,
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async deleteBook(id: string, userId: string): Promise<ServiceResponse<null>> {
     try {
       const existingRecord: StoredBook | undefined = await this.bookRepository.getById(id, { authorId: userId });
