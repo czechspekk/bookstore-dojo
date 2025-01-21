@@ -22,7 +22,7 @@ There are 2 users available for Author
 `username` / `password`
 
 `john-doe` / `YAY`
-`darth-vader` / `darth-vader`
+`darth-vader` / `YAY`
 
 # Decisions made on the way
 
@@ -44,7 +44,8 @@ Adopted from the boilerplate, each API module consists of
 > /src/common/middleware/
 
 *auth.ts* - Wrapper around [Express-jwt](https://www.npmjs.com/package/express-jwt) middleware 
-				Further improvements could be done on the jwt layer - but this was not really the scope of the test
+Further improvements could be done on the jwt layer - but this was not really the scope of the test
+
 errorHandler.ts - Common error handler for various errors
 
 ## API functionality
